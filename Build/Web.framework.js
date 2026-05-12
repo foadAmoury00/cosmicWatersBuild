@@ -16,6 +16,8 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
   
     onUpdatePtr: null,
 
+    onResizeHandler: null,
+
     isRunning: false,
 
     filterMinCF: 0.001, 
@@ -101,6 +103,11 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
         this.video.srcObject = null;
       }
       
+      if (this.onResizeHandler) {
+        window.removeEventListener('resize', this.onResizeHandler);
+        this.onResizeHandler = null;
+      }
+
       if (this.video) this.video.remove();
       this.video = null; 
     },
@@ -204,6 +211,8 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
 
 
       const onResize = () => {
+        if (!this.video || this.video.videoWidth === 0) return;
+
         this.video.width = this.video.videoWidth;
         this.video.height = this.video.videoHeight;
 
@@ -218,9 +227,10 @@ var Module=typeof unityFramework!="undefined"?unityFramework:{};var readyPromise
           Module.dynCall_v(this.onCameraConfigChangePtr);
         }
       }
-      window.addEventListener('resize', onResize);
+      this.onResizeHandler = onResize;
+      window.addEventListener('resize', this.onResizeHandler);
 
-      onResize();
+      this.onResizeHandler();
 
       controller.processVideo(input);
     },
@@ -259,6 +269,8 @@ Module["MindARImage"] = {
   onCameraConfigChangePtr: null,
 
   onUpdatePtr: null,
+
+  onResizeHandler: null,
 
   isRunning: false,
 
@@ -359,6 +371,11 @@ Module["MindARImage"] = {
       this.video.srcObject = null;
     }
     
+    if (this.onResizeHandler) {
+      window.removeEventListener('resize', this.onResizeHandler);
+      this.onResizeHandler = null;
+    }
+
     if (this.video) this.video.remove();
     this.video = null; 
   },
@@ -465,6 +482,8 @@ Module["MindARImage"] = {
     window.requestAnimationFrame(drawWebcamTexture);
 
     const onResize = () => {
+      if (!this.video || this.video.videoWidth === 0) return;
+
       this.video.width = this.video.videoWidth;
       this.video.height = this.video.videoHeight;
 
@@ -483,9 +502,10 @@ Module["MindARImage"] = {
         Module.dynCall_v(this.onCameraConfigChangePtr);
       }
     }
-    window.addEventListener('resize', onResize);
+    this.onResizeHandler = onResize;
+    window.addEventListener('resize', this.onResizeHandler);
 
-    onResize();
+    this.onResizeHandler();
 
     controller.processVideo(input);
   },
